@@ -181,3 +181,4 @@ NOTE: Be sure to merge the latest from "upstream" before making a pull request!
 | 1.0.7 | Updated UploadFile result format |
 | 1.0.8 | Bug fix to UploadFile result format |
 | 1.1.0 | A number of small fixes to documentation and code |
+| 1.2.0 | .NET6 only (no multitargeting) version of Task. Library updates. |
