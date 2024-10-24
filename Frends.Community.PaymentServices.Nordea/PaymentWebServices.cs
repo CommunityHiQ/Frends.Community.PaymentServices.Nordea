@@ -9,6 +9,7 @@ using Frends.Community.PaymentServices.Nordea.Helpers;
 using Frends.Community.PaymentServices.Nordea.Services;
 using Environment = Frends.Community.PaymentServices.Nordea.Helpers.Enums.Environment;
 using Status = Frends.Community.PaymentServices.Nordea.Helpers.Enums.Status;
+using System.Net;
 
 #pragma warning disable 1591
 
@@ -16,6 +17,7 @@ namespace Frends.Community.PaymentServices.Nordea
 {
     public class WebServices
     {
+
         /// <summary>
         /// Fetches information on authorized user file types and service IDs. 
         /// In case of an error an exception is thrown.
