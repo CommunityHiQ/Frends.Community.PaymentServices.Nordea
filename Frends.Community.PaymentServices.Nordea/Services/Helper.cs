@@ -234,39 +234,42 @@ namespace Frends.Community.PaymentServices.Nordea.Services
                 requestHeader,
                 new XElement(namespaces["mod"] + "ApplicationRequest", requestBase64));
         }
+//Builds signature XML element
+private static XmlElement GetSignatureNode(XmlDocument document, X509Certificate2 certificate, IList<string> referenceIds, KeyInfo keyInfo)
+{
+    using (var rsa = certificate.GetRSAPrivateKey())
+    {
+        var signedXmlA = new SignedXmlWithId(document) { SigningKey = rsa };
 
-        //Builds signature XML element
-        private static XmlElement GetSignatureNode(XmlDocument document, X509Certificate2 certificate, IList<string> referenceIds, KeyInfo keyInfo)
+        if (referenceIds.Any())
         {
-            var signedXmlA = new SignedXmlWithId(document) { SigningKey = certificate.PrivateKey };
+            signedXmlA.SignedInfo.CanonicalizationMethod = "http://www.w3.org/2001/10/xml-exc-c14n#";
 
-            if (referenceIds.Any())
+            foreach (var referenceId in referenceIds)
             {
-                signedXmlA.SignedInfo.CanonicalizationMethod = "http://www.w3.org/2001/10/xml-exc-c14n#";
-
-                foreach (var referenceId in referenceIds)
-                {
-                    var transform = new XmlDsigExcC14NTransform();
-                    var reference = new Reference { Uri = $"#{referenceId}" };
-                    reference.AddTransform(transform);
-                    signedXmlA.AddReference(reference);
-                }
-            }
-            else
-            {
-                signedXmlA.SignedInfo.CanonicalizationMethod = "http://www.w3.org/TR/2001/REC-xml-c14n-20010315";
-
-                var transform = new XmlDsigEnvelopedSignatureTransform();
-                var reference = new Reference { Uri = string.Empty };     // this value needs to be empty not null
+                var transform = new XmlDsigExcC14NTransform();
+                var reference = new Reference { Uri = $"#{referenceId}" };
                 reference.AddTransform(transform);
                 signedXmlA.AddReference(reference);
             }
-
-            signedXmlA.KeyInfo = keyInfo;
-            signedXmlA.ComputeSignature();
-
-            return signedXmlA.GetXml();
         }
+        else
+        {
+            signedXmlA.SignedInfo.CanonicalizationMethod = "http://www.w3.org/TR/2001/REC-xml-c14n-20010315";
+
+            var transform = new XmlDsigEnvelopedSignatureTransform();
+            var reference = new Reference { Uri = string.Empty }; // this value needs to be empty not null
+            reference.AddTransform(transform);
+            signedXmlA.AddReference(reference);
+        }
+
+        signedXmlA.KeyInfo = keyInfo;
+        signedXmlA.ComputeSignature();
+
+        return signedXmlA.GetXml();
+    }
+}
+
 
         private static KeyInfo GetKeyInfoWithCert(X509Certificate2 certificate)
         {

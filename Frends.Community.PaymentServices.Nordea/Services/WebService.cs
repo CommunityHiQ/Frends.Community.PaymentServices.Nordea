@@ -150,9 +150,8 @@ namespace Frends.Community.PaymentServices.Nordea.Services
             handler.AllowAutoRedirect = settings.FollowRedirects;
             // Should this use a proxy?
 
-            //Allow all endpoint types
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 |
-                                                   SecurityProtocolType.Tls | SecurityProtocolType.Ssl3;
+        // Set the security protocol to TLS 1.2
+        handler.SslProtocols = System.Security.Authentication.SslProtocols.Tls12;
         }
     }
 }
